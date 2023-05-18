@@ -15,7 +15,7 @@ public class UsuarioController {
     @Autowired
     private UsuarioService service;
 
-    @GetMapping
+    @GetMapping("usuarios")
     public List<Usuario> listar() {
         return service.listar();
     }
