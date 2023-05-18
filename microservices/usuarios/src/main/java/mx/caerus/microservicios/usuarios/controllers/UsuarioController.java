@@ -29,7 +29,7 @@ public class UsuarioController {
         return ResponseEntity.notFound().build();
     }
 
-    @PostMapping
+    @PostMapping("guardar")
     //@ResponseStatus(HttpStatus.CREATED)
     //public Usuario crear(@RequestBody Usuario usuario) {
     public ResponseEntity<?> crear(@RequestBody Usuario usuario) {
