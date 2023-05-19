@@ -1,14 +1,15 @@
 package mx.caerus.microservicios.usuarios.controllers;
 
+import jakarta.validation.Valid;
 import mx.caerus.microservicios.usuarios.models.entity.Usuario;
 import mx.caerus.microservicios.usuarios.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class UsuarioController {
@@ -32,16 +33,36 @@ public class UsuarioController {
     @PostMapping("guardar")
     //@ResponseStatus(HttpStatus.CREATED)
     //public Usuario crear(@RequestBody Usuario usuario) {
-    public ResponseEntity<?> crear(@RequestBody Usuario usuario) {
-        //return service.guardar(usuario);
+    public ResponseEntity<?> crear(@Valid @RequestBody Usuario usuario, BindingResult result) {
+        if(service.porEmail(usuario.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("mensaje", "Ya existe un usuario con ese correo electronico!"));
+        }
+
+        if (result.hasErrors()) {
+            return validar(result);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
     }
 
+    private static ResponseEntity<Map<String, String>> validar(BindingResult result) {
+        Map<String, String> errores = new HashMap<>();
+        result.getFieldErrors().forEach(err -> {
+            errores.put(err.getField(), "El campo " + err.getField() + " " + err.getDefaultMessage());
+        });
+        return ResponseEntity.badRequest().body(errores);
+    }
+
     @PutMapping("/{id}")
-    public  ResponseEntity<?> editar(@RequestBody Usuario usuario, @PathVariable Long id) {
+    public ResponseEntity<?> editar(@Valid @RequestBody Usuario usuario, BindingResult result, @PathVariable Long id) {
+        if (result.hasErrors()) {
+            return validar(result);
+        }
         Optional<Usuario> o = service.porId(id);
         if (o.isPresent()) {
             Usuario usuarioDb = o.get();
+            if(!usuario.getEmail().equalsIgnoreCase(usuarioDb.getEmail()) && service.porEmail(usuario.getEmail()).isPresent()) {
+                return ResponseEntity.badRequest().body(Collections.singletonMap("mensaje", "Ya existe un usuario con ese correo electronico!"));
+            }
             usuarioDb.setNombre(usuario.getNombre());
             usuarioDb.setEmail(usuario.getEmail());
             usuarioDb.setPassword(usuario.getPassword());

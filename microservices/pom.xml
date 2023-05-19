@@ -17,6 +17,7 @@
 
     <modules>
         <module>usuarios</module>
+        <module>cursos</module>
     </modules>
 
     <properties>
