@@ -34,13 +34,14 @@ public class UsuarioController {
     //@ResponseStatus(HttpStatus.CREATED)
     //public Usuario crear(@RequestBody Usuario usuario) {
     public ResponseEntity<?> crear(@Valid @RequestBody Usuario usuario, BindingResult result) {
-        if(service.porEmail(usuario.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body(Collections.singletonMap("mensaje", "Ya existe un usuario con ese correo electronico!"));
-        }
-
         if (result.hasErrors()) {
             return validar(result);
         }
+        // if(!usuario.getEmail().isBlank() && service.porEmail(usuario.getEmail()).isPresent()) {
+        if(!usuario.getEmail().isBlank() && service.existePorEmail(usuario.getEmail())) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("mensaje", "Ya existe un usuario con ese correo electronico!"));
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
     }
 
