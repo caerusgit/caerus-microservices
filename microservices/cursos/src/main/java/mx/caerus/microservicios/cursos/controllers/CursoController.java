@@ -1,7 +1,7 @@
 package mx.caerus.microservicios.cursos.controllers;
 
 import jakarta.validation.Valid;
-import mx.caerus.microservicios.cursos.entity.Curso;
+import mx.caerus.microservicios.cursos.models.entity.Curso;
 import mx.caerus.microservicios.cursos.services.CursoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
